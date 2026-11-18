@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-portal="admin"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="iw-build" content="5.7">
+<meta name="robots" content="noindex">
+<title>InstaWarehouse · Admin Console</title>
+<link rel="stylesheet" href="/static/css/app.css?v=5.7">
+</head><body>
+<div class="aurora"><i></i><i></i><i></i></div>
+
+<section id="auth" class="hidden">
+  <div class="hero">
+    <div class="lockup"><div class="scene"><div class="cube3d"><b></b><b></b><b></b><b></b><b></b><b></b></div></div><span>InstaWarehouse</span></div>
+    <h1>Admin <span>Console</span></h1>
+    <p>Restricted area. Sign in with your administrator email and password, then confirm the 6-digit code that is emailed to you.</p>
+    <div class="feat">
+      <div><i>☰</i><p><b>Users and sign-in activity</b><span>See who is online, block or delete accounts with a reason.</span></p></div>
+      <div><i>⇄</i><p><b>ETL, cube and mining lab</b><span>Run the pipeline, inspect the warehouse and train the models.</span></p></div>
+    </div>
+    <p class="sub" style="margin-top:14px">Not an administrator? <a href="/">Go to the user portal</a></p>
+  </div>
+  <div class="glass authcard">
+    <form id="fIn">
+      <h3 style="margin-bottom:12px">Administrator sign-in</h3>
+      <label class="f">Admin email<input id="inEmail" type="email" autocomplete="username" required></label>
+      <label class="f">Password<input id="inPw" type="password" autocomplete="current-password" required></label>
+      <div class="err" id="inErr"></div>
+      <button class="btn p" style="width:100%" id="inBtn">Continue</button>
+      <p class="sub" style="margin-top:12px">Every sign-in attempt is logged. Forgot the password? Run <b>python reset_admin.py</b> on the server.</p>
+    </form>
+  </div>
+</section>
+
+<div id="app" class="hidden">
+  <nav>
+    <div class="brand"><div class="mini"><div class="cube3d"><b></b><b></b><b></b><b></b><b></b><b></b></div></div><span>Admin Console</span></div>
+    <div id="menu"></div>
+    <div class="me"><div><b id="meName"></b><span class="badge" id="meRole"></span></div><div class="sub" id="meEmail"></div>
+      <div class="row" style="margin-top:8px"><button class="btn sm" id="theme" type="button">◐ Theme</button><button class="btn sm" id="logout" type="button">Sign out</button></div></div>
+  </nav>
+  <div class="navback" id="navBack"></div>
+  <main>
+    <div class="consolebar"><b>ADMIN CONSOLE</b><span>Actions here are recorded in the audit log. You are signed out after 30 minutes of inactivity.</span></div>
+    <div class="top"><button class="btn sm navbtn" id="navBtn" type="button" aria-label="Open menu" aria-expanded="false">☰</button><div><h2 id="title"></h2><div class="sub" id="crumb"></div></div>
+      <div class="tools"><button class="btn sm" id="palBtn" type="button">⌘ Search  Ctrl+K</button></div></div>
+    <div id="view"></div>
+  </main>
+</div>
+<div id="toasts"></div>
+<script src="/static/js/common.js?v=5.7"></script>
+<script src="/static/js/region.js?v=5.7"></script>
+<script src="/static/js/reports.js?v=5.7"></script>
+<script src="/static/js/admin.js?v=5.7"></script>
+</body></html>

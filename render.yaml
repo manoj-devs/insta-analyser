@@ -1,0 +1,19 @@
+# FREE plan, Python runtime (no Docker). Users and reports are kept only until the service restarts or redeploys; it sleeps after 15 minutes without visitors.
+services:
+  - type: web
+    name: instawarehouse
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt && python -c "import app.config"
+    startCommand: python main.py
+    healthCheckPath: /api/version
+    envVars:
+      - {key: PYTHON_VERSION, value: 3.12.7}
+      - {key: APP_ENV, value: production}
+      - {key: SECRET_KEY, generateValue: true}
+      - {key: OTP_CHANNELS, value: email}
+      - {key: OTP_LOGIN, value: new_device}
+      - {key: BREVO_API_KEY, sync: false}
+      - {key: MAIL_FROM, sync: false}
+      - {key: ADMIN_EMAIL, sync: false}
+      - {key: ADMIN_PASSWORD, sync: false}

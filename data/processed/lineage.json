@@ -1,0 +1,82 @@
+{
+  "generated": "2026-10-28 02:48:40",
+  "datasets": {
+    "raw_reach": {
+      "rows": null
+    },
+    "raw_posts": {
+      "rows": null
+    },
+    "clean_reach": {
+      "rows": 102,
+      "columns": 18
+    },
+    "clean_posts": {
+      "rows": 605563,
+      "columns": 17
+    },
+    "combined": {
+      "rows": 605665,
+      "columns": 11
+    }
+  },
+  "steps": [
+    {
+      "dataset": "reach",
+      "step": "load clean file",
+      "before": 102,
+      "after": 102,
+      "removed": 0,
+      "note": "clean_instagram_reach.csv"
+    },
+    {
+      "dataset": "posts",
+      "step": "load clean file",
+      "before": 605563,
+      "after": 605563,
+      "removed": 0,
+      "note": "clean_instagram_posts.csv"
+    },
+    {
+      "dataset": "combined",
+      "step": "load combined file",
+      "before": 605665,
+      "after": 605665,
+      "removed": 0,
+      "note": "combined_instagram_data.csv"
+    }
+  ],
+  "checks": [
+    {
+      "name": "Combined rows = clean reach + clean posts",
+      "expected": 605665,
+      "actual": 605665,
+      "ok": true
+    },
+    {
+      "name": "Warehouse fact_posts rows = clean posts rows",
+      "expected": 605563,
+      "actual": 605563,
+      "ok": true
+    },
+    {
+      "name": "Warehouse fact_reach rows = clean reach rows",
+      "expected": 102,
+      "actual": 102,
+      "ok": true
+    },
+    {
+      "name": "Warehouse combined_posts rows = combined rows",
+      "expected": 605665,
+      "actual": 605665,
+      "ok": true
+    },
+    {
+      "name": "Null values in combined dataset",
+      "expected": 0,
+      "actual": 0,
+      "ok": true
+    }
+  ],
+  "all_ok": true
+}

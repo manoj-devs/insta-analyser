@@ -1,0 +1,9 @@
+.env
+__pycache__/
+*.pyc
+.pytest_cache/
+data/auth.db*
+data/secret.key
+data/uploads/
+bin/
+data/processed/warehouse.db

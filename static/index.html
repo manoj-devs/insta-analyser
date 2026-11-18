@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-portal="user"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="iw-build" content="5.7">
+<title>InstaWarehouse · Sign in</title>
+<link rel="stylesheet" href="/static/css/app.css?v=5.7">
+</head><body>
+<div class="aurora"><i></i><i></i><i></i></div>
+
+<section id="auth" class="hidden">
+  <div class="hero">
+    <div class="lockup"><div class="scene"><div class="cube3d"><b></b><b></b><b></b><b></b><b></b><b></b></div></div><span>InstaWarehouse</span></div>
+    <h1>Turn Instagram data into <span>decisions</span>.</h1>
+    <p>Explore a data warehouse of 605,665 Instagram posts, spin the 3D OLAP cube, then analyse your own account or any public figure for a forecast and an estimated fee per post.</p>
+    <div class="feat">
+      <div><i>◆</i><p><b>3D OLAP cube and schemas</b><span>Slice the combined dataset by category, tier and time; see the star and snowflake design.</span></p></div>
+      <div><i>⇄</i><p><b>Live ETL from your clean files</b><span>Two sources, cleaned and combined into one warehouse, with checks at every step.</span></p></div>
+      <div><i>✦</i><p><b>Data mining</b><span>Engagement predictor, creator personas, caption checker and an influencer fee estimator.</span></p></div>
+    </div>
+    <div class="stats"><span><b>605,665</b> posts</span><span><b>3</b> clean files</span><span><b>4</b> mining models</span></div>
+  </div>
+  <div class="glass authcard">
+    <div class="tabs"><button id="tabIn" class="on" type="button">Sign in</button><button id="tabUp" type="button">Create account</button></div>
+    <form id="fIn">
+      <label class="f">Email<input id="inEmail" type="email" autocomplete="username" required></label>
+      <label class="f">Password<input id="inPw" type="password" autocomplete="current-password" required></label>
+      <div class="err" id="inErr"></div>
+      <button class="btn p" style="width:100%" id="inBtn">Sign in</button>
+      <p class="sub" style="margin-top:12px"><a href="#" data-go="for">Forgot your password?</a></p>
+    </form>
+    <form id="fUp" class="hidden">
+      <div class="steps"><i class="on" id="st1"></i><i id="st2"></i></div>
+      <div id="upS1">
+        <div class="stephead"><b>Create your account</b><span class="sub">Step 1 of 2</span></div>
+        <label class="f">Full name<input id="upName" autocomplete="name" required maxlength="60"></label>
+        <label class="f">Email<input id="upEmail" type="email" autocomplete="email" required></label>
+        <label class="f">Password<input id="upPw" type="password" autocomplete="new-password" required></label><div class="meter" id="upMeter"></div>
+        <label class="f">Repeat password<input id="upPw2" type="password" autocomplete="new-password" required></label>
+        <p class="sub">At least 8 characters with an uppercase letter, a lowercase letter and a number. Common passwords and disposable emails are not allowed.</p>
+        <button class="btn p" style="width:100%" id="upNext" type="button">Continue</button>
+      </div>
+      <div id="upS2" class="hidden">
+        <div class="stephead"><b>About you</b><span class="sub">Step 2 of 2</span></div>
+        <div class="row"><label class="f" style="flex:1">Phone (optional)<input id="upPhone" type="tel" autocomplete="tel" placeholder="+919876543210"></label>
+        <label class="f" style="flex:1">Country<select id="upCountry" required></select></label></div>
+        <div class="row"><label class="f" style="flex:1">I am a<select id="upType"></select></label>
+        <label class="f" style="flex:1">Instagram handle (optional)<input id="upHandle" placeholder="@yourhandle" maxlength="31"></label></div>
+        <label class="f">Interests (optional, tap to choose or type your own)<input id="upInt" maxlength="120" placeholder="food, travel, fitness"></label><div class="pick" id="upPick"></div>
+        <label class="chk"><input type="checkbox" id="upConsent"> <span>I agree to the terms. I understand this system stores my profile, the accounts I analyse, my page visits and my sign-in history, and that administrators can see them. I can download my data any time.</span></label>
+        <div class="btnrow"><button class="btn" id="upBack" type="button">Back</button><button class="btn p" id="upBtn">Create account</button></div>
+      </div>
+      <div class="err" id="upErr"></div>
+    </form>
+    <form id="fFor" class="hidden">
+      <h3>Reset your password</h3><p class="sub">Enter your email and we will send a 6-digit code.</p>
+      <label class="f">Email<input id="forEmail" type="email" required></label>
+      <div class="err" id="forErr"></div>
+      <button class="btn p" style="width:100%" id="forBtn">Send code</button>
+      <p class="sub" style="margin-top:12px"><a href="#" data-go="in">Back to sign in</a></p>
+    </form>
+    <form id="fRes" class="hidden">
+      <h3>Choose a new password</h3><p class="sub">For <b id="rsEmail"></b></p>
+      <label class="f">New password<input id="rsPw" type="password" autocomplete="new-password" required></label><div class="meter" id="rsMeter"></div>
+      <label class="f">Repeat new password<input id="rsPw2" type="password" autocomplete="new-password" required></label>
+      <div class="err" id="rsErr"></div>
+      <button class="btn p" style="width:100%" id="rsBtn">Change password</button>
+    </form>
+  </div>
+</section>
+
+<div id="app" class="hidden">
+  <nav>
+    <div class="brand"><div class="mini"><div class="cube3d"><b></b><b></b><b></b><b></b><b></b><b></b></div></div><span>InstaWarehouse</span></div>
+    <div id="menu"></div>
+    <div class="me"><img id="meAv" class="av" alt="" hidden><div><b id="meName"></b><span class="badge" id="meRole"></span></div><div class="sub" id="meEmail"></div>
+      <div class="row" style="margin-top:8px"><button class="btn sm" id="theme" type="button">◐ Theme</button><button class="btn sm" id="logout" type="button">Sign out</button></div></div>
+  </nav>
+  <div class="navback" id="navBack"></div>
+  <main>
+    <div class="top"><button class="btn sm navbtn" id="navBtn" type="button" aria-label="Open menu" aria-expanded="false">☰</button><div><h2 id="title"></h2><div class="sub" id="crumb"></div></div>
+      <div class="tools"><button class="btn sm" id="palBtn" type="button">⌘ Search  Ctrl+K</button></div></div>
+    <div id="view"></div>
+  </main>
+</div>
+<div id="toasts"></div>
+<script src="/static/js/common.js?v=5.7"></script>
+<script src="/static/js/region.js?v=5.7"></script>
+<script src="/static/js/creator.js?v=5.7"></script>
+<script src="/static/js/reports.js?v=5.7"></script>
+<script src="/static/js/user.js?v=5.7"></script>
+</body></html>

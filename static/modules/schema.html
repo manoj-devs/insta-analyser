@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Instagram Data Warehouse: Star &amp; Snowflake Schema</title>
+<style>
+:root{--bg:#f6f7fb;--card:#fff;--ink:#1c2030;--mut:#6b7186;--line:#9aa3c0;--fact:#e1306c;--dim:#405de6;--bridge:#f77737;--bd:#dfe3f0;--hdr:#fff;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10121b;--card:#1a1e2c;--ink:#eceefb;--mut:#9aa0ba;--line:#5b6485;--bd:#2c3249}}
+:root[data-theme="dark"]{--bg:#10121b;--card:#1a1e2c;--ink:#eceefb;--mut:#9aa0ba;--line:#5b6485;--bd:#2c3249}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;padding:16px}
+h1{font-size:1.25rem;margin:0 0 4px}
+.sub{color:var(--mut);font-size:.9rem;margin:0 0 14px}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+button{font:inherit;border:1px solid var(--bd);background:var(--card);color:var(--ink);padding:8px 16px;border-radius:999px;cursor:pointer;transition:.25s}
+button.act{background:linear-gradient(90deg,var(--dim),var(--fact));color:#fff;border-color:transparent;box-shadow:0 4px 14px rgba(225,48,108,.35)}
+.legend{margin-left:auto;display:flex;gap:12px;font-size:.8rem;color:var(--mut)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:middle}
+.wrap{overflow-x:auto;background:var(--card);border:1px solid var(--bd);border-radius:16px}
+svg{display:block;width:100%;min-width:820px;height:auto}
+.info{margin-top:12px;background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px 14px;font-size:.9rem;min-height:64px}
+.info b{color:var(--fact)}
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+.stat{flex:1;min-width:120px;background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:10px 12px}
+.stat span{display:block;font-size:1.4rem;font-weight:700}
+.stat small{color:var(--mut)}
+.tbl{cursor:pointer;transition:opacity .3s}
+.box{animation:pop .6s ease backwards var(--d),bob 5s ease-in-out infinite alternate calc(.6s + var(--d));transform-box:fill-box;transform-origin:center}
+@keyframes pop{from{opacity:0;transform:scale(.7) translateY(20px)}to{opacity:1;transform:none}}
+@keyframes bob{from{transform:translateY(-3px)}to{transform:translateY(3px)}}
+.rel{transition:opacity .3s}
+.rel line{stroke:var(--line);stroke-width:2;stroke-dasharray:7 6;animation:flow 1s linear infinite}
+@keyframes flow{to{stroke-dashoffset:-13}}
+.rel text{font-size:12px;font-weight:700;fill:var(--ink)}
+svg.focus .tbl:not(.on){opacity:.22}
+svg.focus .rel:not(.on){opacity:.08}
+.rel.on line{stroke:var(--fact);stroke-width:3;animation-duration:.4s}
+.tbl:hover rect.shell{filter:drop-shadow(0 6px 12px rgba(0,0,0,.25))}
+.cn{font-size:11.5px;fill:var(--ink);font-family:ui-monospace,Menlo,Consolas,monospace}
+.cn .k{font-weight:700}
+.th{font-size:13px;font-weight:700;fill:#fff}
+body.embed{background:transparent;padding:0}body.embed h1,body.embed .sub{display:none}
+</style>
+</head>
+<body>
+<h1>Instagram Business Data Warehouse</h1>
+<p class="sub">Hover or tap any table to trace its relationships. Switch between schemas to compare.</p>
+<div class="bar">
+<button id="bStar" class="act">★ Star Schema</button>
+<button id="bSnow">❄ Snowflake Schema</button>
+<div class="legend"><span><i style="background:var(--fact)"></i>Fact</span><span><i style="background:var(--dim)"></i>Dimension</span><span><i style="background:var(--bridge)"></i>Bridge</span></div>
+</div>
+<div class="wrap"><svg id="svg" viewBox="0 0 1200 800" role="img" aria-label="Schema diagram"></svg></div>
+<div class="info" id="info">Select a table to see what it stores.</div>
+<div class="stats" id="stats"></div>
+
+<script>
+var COUNTS={};
+var S={"star": {"h": "Star schema: each fact table joins directly to flat dimensions. Fewer joins and faster queries, with some repeated data. The posts star and the reach star are separate because the two datasets share no key.", "vb": "0 0 1200 960", "lv": 1, "t": [{"id": "fact_posts", "k": "fact", "x": 495, "y": 40, "c": ["pk:post_id", "fk:date_key", "fk:user_key", "fk:category_key", "post_hour", "likes", "comments", "engagement", "engagement_rate_pct", "followers_at_post", "following_at_post", "num_posts_at_post", "hashtag_count", "mention_count", "description_length"], "d": "Fact table of the posts dataset (605,563 posts): one row per post with likes, comments, engagement, followers at posting time, hashtag and mention counts.", "w": 210}, {"id": "dim_date", "k": "dim", "x": 130, "y": 30, "c": ["pk:date_key", "full_date", "day", "month", "month_name", "quarter", "year", "weekday", "is_weekend"], "d": "Date dimension: one row per calendar day. Flat: all levels live in one table."}, {"id": "dim_user", "k": "dim", "x": 130, "y": 270, "c": ["pk:user_key", "username", "latest_followers", "latest_following", "latest_num_posts", "is_business_account", "follower_tier"], "d": "Account dimension: latest profile snapshot per account, with its follower tier (Nano to Mega)."}, {"id": "dim_category", "k": "dim", "x": 870, "y": 150, "c": ["pk:category_key", "category_name"], "d": "Content category of a post (19 categories)."}, {"id": "fact_reach", "k": "fact", "x": 495, "y": 520, "c": ["pk:post_id", "impressions", "from_home", "from_hashtags", "from_explore", "from_other", "saves", "comments", "shares", "likes", "profile_visits", "follows", "caption", "hashtags", "hashtag_count", "total_engagement", "engagement_rate_pct", "follow_conversion_pct"], "d": "Fact table of the reach dataset (102 posts): impressions by source, saves, shares, profile visits and follows. A separate star: it has no account or category.", "w": 210}, {"id": "bridge_reach_hashtag", "k": "bridge", "x": 250, "y": 690, "c": ["pk,fk:post_id", "pk,fk:hashtag_key"], "d": "Bridge table resolving the many-to-many link: one post has many hashtags and one hashtag appears on many posts."}, {"id": "dim_hashtag", "k": "dim", "x": 20, "y": 690, "c": ["pk:hashtag_key", "hashtag"], "d": "One row per distinct hashtag found in the reach dataset."}], "r": [["fact_posts", "dim_date"], ["fact_posts", "dim_user"], ["fact_posts", "dim_category"], ["bridge_reach_hashtag", "fact_reach"], ["bridge_reach_hashtag", "dim_hashtag"]]}, "snow": {"h": "Snowflake schema: dimensions are normalized into sub-tables (date into month, quarter and year; tier and topic group split out). Less repetition, but more joins.", "vb": "0 0 1230 1060", "lv": 4, "t": [{"id": "dim_year", "k": "dim", "x": 20, "y": 20, "c": ["pk:year_key", "year_no"], "d": "Year level: the top of the date hierarchy."}, {"id": "dim_quarter", "k": "dim", "x": 240, "y": 20, "c": ["pk:quarter_key", "quarter_no", "fk:year_key"], "d": "Quarter level. Links up to year."}, {"id": "dim_month", "k": "dim", "x": 460, "y": 20, "c": ["pk:month_key", "month_name", "fk:quarter_key"], "d": "Month level. Links up to quarter."}, {"id": "dim_date", "k": "dim", "x": 680, "y": 20, "c": ["pk:date_key", "full_date", "day", "weekday", "is_weekend", "fk:month_key"], "d": "Date level. Links up to month: day, month, quarter, year."}, {"id": "fact_posts", "k": "fact", "x": 680, "y": 230, "c": ["pk:post_id", "fk:date_key", "fk:user_key", "fk:category_key", "post_hour", "likes", "comments", "engagement", "engagement_rate_pct", "followers_at_post", "following_at_post", "num_posts_at_post", "hashtag_count", "mention_count", "description_length"], "d": "Fact table of the posts dataset. Same measures as the star schema, but joined to normalized dimensions.", "w": 210}, {"id": "dim_user", "k": "dim", "x": 1000, "y": 230, "c": ["pk:user_key", "username", "latest_followers", "latest_following", "latest_num_posts", "is_business_account", "fk:tier_key"], "d": "Account dimension. The follower tier is moved out into its own table."}, {"id": "dim_follower_tier", "k": "dim", "x": 1000, "y": 450, "c": ["pk:tier_key", "tier_name", "min_followers", "max_followers"], "d": "Follower tier lookup (Nano to Mega), stored once instead of on every account."}, {"id": "dim_category", "k": "dim", "x": 420, "y": 300, "c": ["pk:category_key", "category_name", "fk:group_key"], "d": "Content category, linked to a broader topic group."}, {"id": "dim_topic_group", "k": "dim", "x": 180, "y": 300, "c": ["pk:group_key", "group_name"], "d": "Topic group (e.g. Food, Fitness, Fashion). A design-level table: not yet stored in the warehouse."}, {"id": "fact_reach", "k": "fact", "x": 680, "y": 640, "c": ["pk:post_id", "impressions", "from_home", "from_hashtags", "from_explore", "from_other", "saves", "comments", "shares", "likes", "profile_visits", "follows", "caption", "hashtags", "hashtag_count", "total_engagement", "engagement_rate_pct", "follow_conversion_pct"], "d": "Fact table of the reach dataset, a separate star with its own bridge to hashtags.", "w": 210}, {"id": "bridge_reach_hashtag", "k": "bridge", "x": 430, "y": 740, "c": ["pk,fk:post_id", "pk,fk:hashtag_key"], "d": "Bridge table for the many-to-many link between posts and hashtags."}, {"id": "dim_hashtag", "k": "dim", "x": 190, "y": 740, "c": ["pk:hashtag_key", "hashtag"], "d": "One row per distinct hashtag."}], "r": [["fact_posts", "dim_date"], ["dim_date", "dim_month"], ["dim_month", "dim_quarter"], ["dim_quarter", "dim_year"], ["fact_posts", "dim_user"], ["dim_user", "dim_follower_tier"], ["fact_posts", "dim_category"], ["dim_category", "dim_topic_group"], ["bridge_reach_hashtag", "fact_reach"], ["bridge_reach_hashtag", "dim_hashtag"]]}};
+var COL={fact:"#e1306c",dim:"#405de6",bridge:"#f77737"},RH=18,HH=30,cur="star";
+var svg=document.getElementById("svg"),info=document.getElementById("info");
+function dims(t){return {w:t.w||190,h:HH+t.c.length*RH+8}}
+function edge(a,b){var A=dims(a),B=dims(b),ax=a.x+A.w/2,ay=a.y+A.h/2,bx=b.x+B.w/2,by=b.y+B.h/2,dx=bx-ax,dy=by-ay;
+ function clip(cx,cy,w,h,dx,dy){var t=Math.min(dx?w/2/Math.abs(dx):1e9,dy?h/2/Math.abs(dy):1e9);return [cx+dx*t,cy+dy*t]}
+ var p=clip(ax,ay,A.w,A.h,dx,dy),q=clip(bx,by,B.w,B.h,-dx,-dy);return [p,q]}
+function render(m){
+ cur=m;var D=S[m],map={},h="";svg.setAttribute("viewBox",D.vb);D.t.forEach(function(t){map[t.id]=t});
+ D.r.forEach(function(r,i){var e=edge(map[r[0]],map[r[1]]),p=e[0],q=e[1];
+  function pt(f){return [p[0]+(q[0]-p[0])*f,p[1]+(q[1]-p[1])*f]}
+  var n=pt(.1),o=pt(.9);
+  h+='<g class="rel" data-a="'+r[0]+'" data-b="'+r[1]+'"><line x1="'+p[0]+'" y1="'+p[1]+'" x2="'+q[0]+'" y2="'+q[1]+'"/><text x="'+(n[0]+(q[0]>p[0]?4:-14))+'" y="'+(n[1]-6)+'">N</text><text x="'+(o[0]+(q[0]>p[0]?-14:4))+'" y="'+(o[1]-6)+'">1</text></g>'});
+ D.t.forEach(function(t,i){var d=dims(t),col=COL[t.k],y=HH+16;
+  h+='<g class="tbl" data-id="'+t.id+'" transform="translate('+t.x+','+t.y+')"><g class="box" style="--d:'+(i*.08)+'s">'+
+  '<rect class="shell" width="'+d.w+'" height="'+d.h+'" rx="10" fill="var(--card)" stroke="'+col+'" stroke-width="2"/>'+
+  '<path d="M0 10a10 10 0 0 1 10-10h'+(d.w-20)+'a10 10 0 0 1 10 10v'+(HH-10)+'h-'+d.w+'z" fill="'+col+'"/>'+
+  '<text class="th" x="10" y="20">'+t.id+'</text>';
+  t.c.forEach(function(c,j){var m=c.match(/^(pk,fk|pk|fk):(.*)$/),tag="",nm=c;if(m){tag=m[1].toUpperCase().replace(",","/");nm=m[2]}
+   h+='<text class="cn" x="10" y="'+(y+j*RH+6)+'">'+(tag?'<tspan class="k" fill="'+col+'">'+tag+' </tspan>':'')+nm+'</text>'});
+  h+='</g></g>'});
+ svg.innerHTML=h;svg.classList.remove("focus");
+ document.getElementById("bStar").className=m=="star"?"act":"";document.getElementById("bSnow").className=m=="snow"?"act":"";
+ info.innerHTML="<b>"+(m=="star"?"Star":"Snowflake")+":</b> "+D.h;
+ document.getElementById("stats").innerHTML=[[D.t.length,"tables"],[D.r.length,"joins"],[D.lv,"levels of dimensions"]].map(function(s){return '<div class="stat"><span>'+s[0]+'</span><small>'+s[1]+'</small></div>'}).join("")}
+function focus(id){var D=S[cur],rel={};rel[id]=1;
+ svg.querySelectorAll(".rel").forEach(function(g){var on=g.dataset.a==id||g.dataset.b==id;g.classList.toggle("on",on);if(on){rel[g.dataset.a]=1;rel[g.dataset.b]=1}});
+ svg.querySelectorAll(".tbl").forEach(function(g){g.classList.toggle("on",!!rel[g.dataset.id])});
+ svg.classList.add("focus");var t=D.t.filter(function(x){return x.id==id})[0];info.innerHTML="<b>"+id+"</b>: "+t.d+(COUNTS[id]!=null?" <b>"+Number(COUNTS[id]).toLocaleString()+" rows</b> in the warehouse.":"")}
+function clear(){svg.classList.remove("focus");info.innerHTML="<b>"+(cur=="star"?"Star":"Snowflake")+":</b> "+S[cur].h}
+svg.addEventListener("mouseover",function(e){var g=e.target.closest(".tbl");if(g)focus(g.dataset.id)});
+svg.addEventListener("mouseleave",clear);
+svg.addEventListener("click",function(e){var g=e.target.closest(".tbl");if(g)focus(g.dataset.id);else clear()});
+document.getElementById("bStar").onclick=function(){render("star")};
+document.getElementById("bSnow").onclick=function(){render("snow")};
+if(location.search.indexOf("embed=1")>-1)document.body.classList.add("embed");
+window.addEventListener("message",function(e){if(e.data&&e.data.type==="theme")document.documentElement.setAttribute("data-theme",e.data.value)});
+render("star");
+fetch("/api/schema/counts",{credentials:"same-origin"}).then(function(r){return r.ok?r.json():{}}).then(function(c){COUNTS=c}).catch(function(){});
+</script>
+</body>
+</html>

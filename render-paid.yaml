@@ -1,0 +1,24 @@
+# PAID blueprint: one central server + one shared database file on a persistent disk (users and posts are kept). Rename this file to render.yaml to use it.
+services:
+  - type: web
+    name: instawarehouse
+    runtime: docker
+    plan: starter            # $7/month, always on, SMTP ports allowed. If memory is tight, use "standard" (2 GB). A paid plan is also needed for the disk.
+    healthCheckPath: /api/version
+    disk:
+      name: iw-data
+      mountPath: /var/data   # auth.db, uploaded pictures and the secret key live here
+      sizeGB: 2
+    envVars:
+      - {key: APP_ENV, value: production}
+      - {key: DATA_DIR, value: /var/data}
+      - {key: SECRET_KEY, generateValue: true}
+      - {key: OTP_CHANNELS, value: email}
+      - {key: OTP_LOGIN, value: new_device}
+      - {key: SMTP_HOST, sync: false}
+      - {key: SMTP_PORT, value: "587"}
+      - {key: SMTP_USER, sync: false}
+      - {key: SMTP_PASS, sync: false}
+      - {key: SMTP_FROM, sync: false}
+      - {key: ADMIN_EMAIL, sync: false}
+      - {key: ADMIN_PASSWORD, sync: false}

@@ -1,0 +1,7 @@
+.env
+__pycache__
+tests
+*.zip
+data/auth.db
+data/secret.key
+data/uploads

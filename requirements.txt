@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+pandas
+openpyxl
+httpx
+pytest
+scikit-learn
+joblib
+numpy
+qrcode
+pillow
+pytesseract
+reportlab
